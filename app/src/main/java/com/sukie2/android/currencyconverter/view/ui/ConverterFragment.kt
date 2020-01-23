@@ -1,4 +1,4 @@
-package com.sukie2.android.currencyconverter.ui.views
+package com.sukie2.android.currencyconverter.view.ui
 
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -7,15 +7,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.sukie2.android.currencyconverter.R
-import com.sukie2.android.currencyconverter.ui.viewmodels.ConverterViewModel
+import com.sukie2.android.currencyconverter.di.ConverterKoinComponent
+import com.sukie2.android.currencyconverter.di.ConverterKoinContext
+import com.sukie2.android.currencyconverter.viewmodel.ConverterViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ConverterFragment : Fragment() {
+
+    private val viewModel by viewModel<ConverterViewModel>()
 
     companion object {
         fun newInstance() = ConverterFragment()
     }
 
-    private lateinit var viewModel: ConverterViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,8 +30,7 @@ class ConverterFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(ConverterViewModel::class.java)
-        // TODO: Use the ViewModel
+        viewModel.getTrafficDateFromService()
     }
 
 }

@@ -1,4 +1,4 @@
-package com.sukie2.android.currencyconverter.ui.views
+package com.sukie2.android.currencyconverter.view.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
