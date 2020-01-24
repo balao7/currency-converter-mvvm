@@ -14,6 +14,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField 'String', 'REVOLUT_BASE_URL', '"https://revolut.duckdns.org/"'
+        buildConfigField 'String', 'RATE_REFRESH_FREQUENCY', '"1"'
     }
     buildTypes {
         release {

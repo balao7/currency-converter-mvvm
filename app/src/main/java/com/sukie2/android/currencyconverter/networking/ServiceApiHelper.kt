@@ -1,10 +1,11 @@
-package com.sukie2.android.currencyconverter.newtworking
+package com.sukie2.android.currencyconverter.networking
 
+import com.sukie2.android.currencyconverter.BuildConfig
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-private const val BASE_URL = "https://revolut.duckdns.org/"
+private const val BASE_URL = BuildConfig.REVOLUT_BASE_URL
 
 class ServiceApiHelper(){
 

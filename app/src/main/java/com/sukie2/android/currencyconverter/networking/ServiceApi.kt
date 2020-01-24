@@ -1,4 +1,4 @@
-package com.sukie2.android.currencyconverter.newtworking
+package com.sukie2.android.currencyconverter.networking
 
 import com.sukie2.android.currencyconverter.model.CurrencyResponse
 import retrofit2.Call

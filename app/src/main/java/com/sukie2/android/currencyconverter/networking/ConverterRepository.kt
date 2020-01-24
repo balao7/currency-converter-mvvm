@@ -1,4 +1,4 @@
-package com.sukie2.android.currencyconverter.newtworking
+package com.sukie2.android.currencyconverter.networking
 
 import android.content.Context
 import android.widget.Toast
