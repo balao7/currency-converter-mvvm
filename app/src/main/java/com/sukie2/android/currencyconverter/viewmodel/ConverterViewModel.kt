@@ -2,30 +2,45 @@ package com.sukie2.android.currencyconverter.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.sukie2.android.currencyconverter.model.Currency
+import androidx.lifecycle.viewModelScope
+import com.sukie2.android.currencyconverter.extentions.filterNullForEmpty
+import com.sukie2.android.currencyconverter.model.RVCurrency
+import com.sukie2.android.currencyconverter.model.CurrencyResponse
 import com.sukie2.android.currencyconverter.networking.ConverterRepository
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.koin.core.KoinComponent
 import org.koin.core.inject
 
 
 class ConverterViewModel : ViewModel(), KoinComponent {
     private val repository: ConverterRepository by inject()
-    val currencyLiveData = MutableLiveData<ArrayList<Currency>>()
-    var camerasList: List<String> = listOf()
+    val currencyLiveData = MutableLiveData<List<RVCurrency>>()
+    var baseAmount: Float = 1.0f
+    var baseCurrency = "EUR"
 
-    //Using Kotlin higher order functions to simplify the class
-    fun getCurrencyRates() {
-        repository.getTrafficDateFromService("EUR", cbOnSuccess = {
-            val list = mutableListOf<Currency>()
-            it?.rates?.forEach { rate ->
-                list.add(Currency(rate.key, rate.value))
-            }
-            currencyLiveData.value = list as ArrayList<Currency>
-        })
+    /**
+     * This appends the base currency record to the top of the currency list returned from remote service.
+     */
+    private fun getConfiguredList(response: CurrencyResponse?): List<RVCurrency>{
+        val list = mutableListOf<RVCurrency>()
+        response?.rates?.toSortedMap()
+        response?.rates?.forEach { rate ->
+            list.add(RVCurrency(rate.key, rate.value * baseAmount))
+        }
+        list.add(0, RVCurrency(response?.base.filterNullForEmpty(), baseAmount))
+        return list
     }
 
-
-//    val trafficLiveData: MutableLiveData<List<TrafficData>> by lazy {
-//        MutableLiveData<List<TrafficData>>()
-//    }
+    fun starDownloadingRates(){
+        viewModelScope.launch {
+            while (isActive) {
+                delay(1000)
+                repository.getTrafficDateFromService(baseCurrency = baseCurrency, cbOnSuccess = {
+                    currencyLiveData.value = getConfiguredList(it)
+                })
+            }
+        }
+    }
 }

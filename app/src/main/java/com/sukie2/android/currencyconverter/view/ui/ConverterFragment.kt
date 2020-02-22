@@ -1,31 +1,28 @@
 package com.sukie2.android.currencyconverter.view.ui
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sukie2.android.currencyconverter.R
-import com.sukie2.android.currencyconverter.di.ConverterKoinComponent
-import com.sukie2.android.currencyconverter.di.ConverterKoinContext
-import com.sukie2.android.currencyconverter.view.adapters.CurrencyConverterAdapter
-import com.sukie2.android.currencyconverter.view.adapters.OnCurrencyValueChangeListener
+import com.sukie2.android.currencyconverter.model.RVCurrency
+import com.sukie2.android.currencyconverter.view.adapters.BaseValueChangeListener
+import com.sukie2.android.currencyconverter.view.adapters.CurrencyAdapter
 import com.sukie2.android.currencyconverter.viewmodel.ConverterViewModel
 import kotlinx.android.synthetic.main.converter_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ConverterFragment : Fragment() {
+class ConverterFragment : Fragment(), BaseValueChangeListener {
 
     private val viewModel by viewModel<ConverterViewModel>()
-    private lateinit var adapter: CurrencyConverterAdapter
+    private lateinit var adapter: CurrencyAdapter
 
     companion object {
         fun newInstance() = ConverterFragment()
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,29 +33,40 @@ class ConverterFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel.getCurrencyRates()
 
-        adapter = CurrencyConverterAdapter(object : OnCurrencyValueChangeListener {
-            override fun onValueChanged(symbol: String, amount: Float) {
-                viewModel.getCurrencyRates()
+        //Fires a timer with a 1 second time interval
+        viewModel.starDownloadingRates()
+
+        //Access the RecyclerView Adapter and load the data into it
+        viewModel.currencyLiveData.observe(viewLifecycleOwner, Observer { ratesList ->
+            if (adapter.itemCount == 0) {
+                adapter.itemPositionList.addAll(ratesList.map { it.name })
+                adapter.notifyDataSetChanged()
+            } else {
+                for (currency in ratesList) {
+                    adapter.itemsMap[currency.name] = currency
+                }
+                adapter.notifyItemRangeChanged(1, ratesList.lastIndex, 3.0)
             }
-        })
-
-
-        viewModel.currencyLiveData.observe(viewLifecycleOwner, Observer { event ->
-            adapter.updateRates(event)
         })
 
         initView()
     }
 
-    /**
-     * Setup view
-     */
     private fun initView() {
+        adapter = CurrencyAdapter(this)
         recyclerViewConverter.setHasFixedSize(true)
         recyclerViewConverter.layoutManager = LinearLayoutManager(context)
         recyclerViewConverter.adapter = adapter
+    }
+
+    override fun onBaseCurrencyChanged(baseCurrency: String, baseAmount: Float) {
+        viewModel.baseCurrency = baseCurrency
+        viewModel.baseAmount = baseAmount
+    }
+
+    override fun onBaseAmountChanged(baseAmount: Float) {
+        viewModel.baseAmount = baseAmount
     }
 
 }
