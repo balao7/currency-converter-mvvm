@@ -26,17 +26,20 @@ class ConverterViewModel : ViewModel(), KoinComponent {
     private fun getConfiguredList(response: CurrencyResponse?): List<RVCurrency>{
         val list = mutableListOf<RVCurrency>()
         response?.rates?.forEach { rate ->
-            list.add(RVCurrency(rate.key, rate.value * baseAmount))
+            list.add(RVCurrency(rate.key, rate.value))
         }
         list.add(0, RVCurrency(response?.base.filterNullForEmpty(), baseAmount))
         return list
     }
 
+    /**
+     * This fires a service call to get the latest rates every one second.
+     */
     fun starDownloadingRates(){
         viewModelScope.launch {
             while (isActive) {
                 delay(1000)
-                repository.getTrafficDateFromService(baseCurrency = baseCurrency, cbOnSuccess = {
+                repository.getRatesFromServer(baseCurrency = baseCurrency, cbOnSuccess = {
                     currencyLiveData.value = getConfiguredList(it)
                 })
             }

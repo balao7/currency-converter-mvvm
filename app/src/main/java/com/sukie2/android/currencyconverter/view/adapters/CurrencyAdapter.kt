@@ -26,12 +26,14 @@ class CurrencyAdapter(private val onAmountChangedListener: BaseValueChangeListen
     private lateinit var context: Context
     var itemPositionList: MutableList<String> = arrayListOf()
     var itemsMap = HashMap<String, RVCurrency>()
+    var baseAmount = 1.0f
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
         if (payloads.isNotEmpty()) {
             when (payloads[0]) {
                 LOAD_RATES -> {
-                    holder.etAmount.setText(itemsMap[itemPositionList[position]]?.rate?.format())
+                    val rate = itemsMap[itemPositionList[position]]?.rate
+                    holder.etAmount.setText(((rate?:0f) * baseAmount).format())
                 }
             }
         } else {
@@ -62,7 +64,8 @@ class CurrencyAdapter(private val onAmountChangedListener: BaseValueChangeListen
         holder.lblCurrencySymbol.text = itemsMap[itemPositionList[position]]?.name
         holder.lblCurrencyName.text = context.getString(nameId)
         holder.icCurrencyFlag.setImageResource(flagId)
-        holder.etAmount.setText(itemsMap[itemPositionList[position]]?.rate?.format())
+        val rate = itemsMap[itemPositionList[position]]?.rate
+        holder.etAmount.setText(((rate?:0f) * baseAmount).format())
         holder.etAmount.addTextChangedListener(holder.textWatcher)
         holder.etAmount.onFocusChangeListener = holder.focusChangeListener
     }
@@ -78,12 +81,9 @@ class CurrencyAdapter(private val onAmountChangedListener: BaseValueChangeListen
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(charSequence: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 if (etAmount.isFocused) {
-                    if (charSequence.toString().isNotEmpty()) {
-                        val newAmt = charSequence.toString().toFloat()
-                        onAmountChangedListener.onBaseAmountChanged(newAmt)
-                    }else{
-                        onAmountChangedListener.onBaseAmountChanged(0f)
-                    }
+                    val newVal = charSequence.toString().isNotEmpty()
+                    baseAmount = if (newVal) charSequence.toString().toFloat() else 0f
+                    notifyItemRangeChanged(1, itemPositionList.lastIndex, LOAD_RATES)
                 }
             }
         }
