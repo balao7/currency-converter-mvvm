@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sukie2.android.currencyconverter.R
+import com.sukie2.android.currencyconverter.utility.isOnline
 import com.sukie2.android.currencyconverter.view.adapters.BaseValueChangeListener
 import com.sukie2.android.currencyconverter.view.adapters.CurrencyAdapter
 import com.sukie2.android.currencyconverter.view.adapters.LOAD_RATES
@@ -34,8 +36,12 @@ class ConverterFragment : Fragment(), BaseValueChangeListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        //Fires a timer with a 1 second time interval
-        viewModel.starDownloadingRates()
+        if (isOnline(context)) {
+            //Fires a timer with a 1 second time interval
+            viewModel.starDownloadingRates()
+        }  else {
+            Toast.makeText(context, R.string.error_offline, Toast.LENGTH_SHORT).show()
+        }
 
         //Access the RecyclerView Adapter and load the data into it
         viewModel.currencyLiveData.observe(viewLifecycleOwner, Observer { ratesList ->

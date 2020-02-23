@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Currency Converter</string>
+    <string name="error_occurred">An error occurred while downloading new rates.</string>
+    <string name="error_offline">Please check if you have an internet connection.</string>
     <string name="currency_aud_name">Australian Dollar</string>
     <string name="currency_bgn_name">Bulgarian Lev</string>
     <string name="currency_brl_name">Brazilian Real</string>
