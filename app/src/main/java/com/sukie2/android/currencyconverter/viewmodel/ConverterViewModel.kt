@@ -25,7 +25,6 @@ class ConverterViewModel : ViewModel(), KoinComponent {
      */
     private fun getConfiguredList(response: CurrencyResponse?): List<RVCurrency>{
         val list = mutableListOf<RVCurrency>()
-        response?.rates?.toSortedMap()
         response?.rates?.forEach { rate ->
             list.add(RVCurrency(rate.key, rate.value * baseAmount))
         }

@@ -8,9 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.sukie2.android.currencyconverter.R
-import com.sukie2.android.currencyconverter.model.RVCurrency
 import com.sukie2.android.currencyconverter.view.adapters.BaseValueChangeListener
 import com.sukie2.android.currencyconverter.view.adapters.CurrencyAdapter
+import com.sukie2.android.currencyconverter.view.adapters.LOAD_RATES
 import com.sukie2.android.currencyconverter.viewmodel.ConverterViewModel
 import kotlinx.android.synthetic.main.converter_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -41,12 +41,15 @@ class ConverterFragment : Fragment(), BaseValueChangeListener {
         viewModel.currencyLiveData.observe(viewLifecycleOwner, Observer { ratesList ->
             if (adapter.itemCount == 0) {
                 adapter.itemPositionList.addAll(ratesList.map { it.name })
+                for (currency in ratesList) {
+                    adapter.itemsMap[currency.name] = currency
+                }
                 adapter.notifyDataSetChanged()
             } else {
                 for (currency in ratesList) {
                     adapter.itemsMap[currency.name] = currency
                 }
-                adapter.notifyItemRangeChanged(1, ratesList.lastIndex, 3.0)
+                adapter.notifyItemRangeChanged(1, ratesList.lastIndex, LOAD_RATES)
             }
         })
 
