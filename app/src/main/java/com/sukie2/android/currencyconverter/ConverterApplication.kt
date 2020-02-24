@@ -10,9 +10,7 @@ class ConverterApplication: Application(){
         super.onCreate()
         // start Koin!
         startKoin {
-            // declare used Android context
             androidContext(this@ConverterApplication)
-            // declare modules
             modules(converterKoinModule)
         }
     }

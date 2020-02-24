@@ -13,7 +13,7 @@ import com.sukie2.android.currencyconverter.utility.isOnline
 import com.sukie2.android.currencyconverter.view.adapters.BaseValueChangeListener
 import com.sukie2.android.currencyconverter.view.adapters.CurrencyAdapter
 import com.sukie2.android.currencyconverter.view.adapters.LOAD_RATES
-import com.sukie2.android.currencyconverter.viewmodel.ConverterViewModel
+import com.sukie2.android.currencyconverter.view.viewmodel.ConverterViewModel
 import kotlinx.android.synthetic.main.converter_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -71,10 +71,6 @@ class ConverterFragment : Fragment(), BaseValueChangeListener {
 
     override fun onBaseCurrencyChanged(baseCurrency: String, baseAmount: Float) {
         viewModel.baseCurrency = baseCurrency
-        viewModel.baseAmount = baseAmount
-    }
-
-    override fun onBaseAmountChanged(baseAmount: Float) {
         viewModel.baseAmount = baseAmount
     }
 

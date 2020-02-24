@@ -1,4 +1,4 @@
-package com.sukie2.android.currencyconverter.model
+package com.sukie2.android.currencyconverter.data.model
 
 import com.google.gson.annotations.SerializedName
 

@@ -1,11 +1,11 @@
-package com.sukie2.android.currencyconverter.viewmodel
+package com.sukie2.android.currencyconverter.view.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sukie2.android.currencyconverter.extentions.filterNullForEmpty
-import com.sukie2.android.currencyconverter.model.RVCurrency
-import com.sukie2.android.currencyconverter.model.CurrencyResponse
+import com.sukie2.android.currencyconverter.data.model.RVCurrency
+import com.sukie2.android.currencyconverter.data.model.CurrencyResponse
 import com.sukie2.android.currencyconverter.networking.ConverterRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive

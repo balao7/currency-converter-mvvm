@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatEditText
@@ -13,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.sukie2.android.currencyconverter.R
 import com.sukie2.android.currencyconverter.extentions.filterNullForEmpty
 import com.sukie2.android.currencyconverter.extentions.format
-import com.sukie2.android.currencyconverter.model.RVCurrency
+import com.sukie2.android.currencyconverter.data.model.RVCurrency
 import com.sukie2.android.currencyconverter.utility.getCurrencyFlagResId
 import com.sukie2.android.currencyconverter.utility.getCurrencyNameResId
 import kotlinx.android.synthetic.main.item_converter.view.*
@@ -28,17 +29,8 @@ class CurrencyAdapter(private val onAmountChangedListener: BaseValueChangeListen
     var itemsMap = HashMap<String, RVCurrency>()
     var baseAmount = 1.0f
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
-        if (payloads.isNotEmpty()) {
-            when (payloads[0]) {
-                LOAD_RATES -> {
-                    val rate = itemsMap[itemPositionList[position]]?.rate
-                    holder.etAmount.setText(((rate?:0f) * baseAmount).format())
-                }
-            }
-        } else {
-            super.onBindViewHolder(holder, position, payloads)
-        }
+    override fun getItemCount(): Int {
+        return itemPositionList.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -52,8 +44,17 @@ class CurrencyAdapter(private val onAmountChangedListener: BaseValueChangeListen
         )
     }
 
-    override fun getItemCount(): Int {
-        return itemPositionList.size
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: MutableList<Any>) {
+        if (payloads.isNotEmpty()) {
+            when (payloads[0]) {
+                LOAD_RATES -> {
+                    val rate = itemsMap[itemPositionList[position]]?.rate
+                    holder.etAmount.setText(((rate?:0f) * baseAmount).format())
+                }
+            }
+        } else {
+            super.onBindViewHolder(holder, position, payloads)
+        }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -88,7 +89,7 @@ class CurrencyAdapter(private val onAmountChangedListener: BaseValueChangeListen
             }
         }
 
-        val focusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+        val focusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
             if (!hasFocus) {
                 return@OnFocusChangeListener
             }
@@ -96,10 +97,12 @@ class CurrencyAdapter(private val onAmountChangedListener: BaseValueChangeListen
             layoutPosition.takeIf { it > 0 }?.also { currentPosition ->
                 itemPositionList.removeAt(currentPosition).also { itemPositionList.add(0, it) }
                 notifyItemMoved(currentPosition, 0)
+
+                val tempCur = itemsMap[itemPositionList[0]]
+                baseAmount = (view as EditText).text.toString().toFloat()
                 onAmountChangedListener.onBaseCurrencyChanged(
-                    itemsMap[itemPositionList[0]]?.name.filterNullForEmpty(),
-                    itemsMap[itemPositionList[0]]?.rate ?: 1f
-                )
+                    tempCur?.name.filterNullForEmpty(), baseAmount)
+
             }
         }
     }
