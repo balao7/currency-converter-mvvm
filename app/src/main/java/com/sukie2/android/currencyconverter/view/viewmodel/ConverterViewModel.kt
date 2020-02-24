@@ -23,7 +23,7 @@ class ConverterViewModel : ViewModel(), KoinComponent {
     /**
      * This appends the base currency record to the top of the currency list returned from remote service.
      */
-    private fun getConfiguredList(response: CurrencyResponse?): List<RVCurrency>{
+    private fun getConfiguredList(response: CurrencyResponse?): List<RVCurrency> {
         val list = mutableListOf<RVCurrency>()
         response?.rates?.forEach { rate ->
             list.add(RVCurrency(rate.key, rate.value))
@@ -35,7 +35,7 @@ class ConverterViewModel : ViewModel(), KoinComponent {
     /**
      * This fires a service call to get the latest rates every one second.
      */
-    fun starDownloadingRates(){
+    fun starDownloadingRates() {
         viewModelScope.launch {
             while (isActive) {
                 delay(1000)

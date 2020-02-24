@@ -15,12 +15,18 @@ import com.sukie2.android.currencyconverter.view.adapters.CurrencyAdapter
 import com.sukie2.android.currencyconverter.view.adapters.LOAD_RATES
 import com.sukie2.android.currencyconverter.view.viewmodel.ConverterViewModel
 import kotlinx.android.synthetic.main.converter_fragment.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ConverterFragment : Fragment(), BaseValueChangeListener {
 
     private val viewModel by viewModel<ConverterViewModel>()
     private lateinit var adapter: CurrencyAdapter
+    private var shouldUpdate = false
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     companion object {
         fun newInstance() = ConverterFragment()
@@ -36,12 +42,7 @@ class ConverterFragment : Fragment(), BaseValueChangeListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        if (isOnline(context)) {
-            //Fires a timer with a 1 second time interval
-            viewModel.starDownloadingRates()
-        }  else {
-            Toast.makeText(context, R.string.error_offline, Toast.LENGTH_SHORT).show()
-        }
+        startDownloader()
 
         //Access the RecyclerView Adapter and load the data into it
         viewModel.currencyLiveData.observe(viewLifecycleOwner, Observer { ratesList ->
@@ -52,10 +53,12 @@ class ConverterFragment : Fragment(), BaseValueChangeListener {
                 }
                 adapter.notifyDataSetChanged()
             } else {
-                for (currency in ratesList) {
-                    adapter.itemsMap[currency.name] = currency
+                if(shouldUpdate) {
+                    for (currency in ratesList) {
+                        adapter.itemsMap[currency.name] = currency
+                    }
+                    adapter.notifyItemRangeChanged(1, ratesList.lastIndex, LOAD_RATES)
                 }
-                adapter.notifyItemRangeChanged(1, ratesList.lastIndex, LOAD_RATES)
             }
         })
 
@@ -69,9 +72,24 @@ class ConverterFragment : Fragment(), BaseValueChangeListener {
         recyclerViewConverter.adapter = adapter
     }
 
+    private fun startDownloader(){
+        if (isOnline(context)) {
+            //Fires a timer with a 1 second time interval
+            viewModel.starDownloadingRates()
+        }  else {
+            Toast.makeText(context, R.string.error_offline, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     override fun onBaseCurrencyChanged(baseCurrency: String, baseAmount: Float) {
+        shouldUpdate = false
         viewModel.baseCurrency = baseCurrency
         viewModel.baseAmount = baseAmount
+        coroutineScope.launch {
+            //Wait until the row moving animation is done.
+            delay(500)
+            shouldUpdate = true
+        }
     }
 
 }

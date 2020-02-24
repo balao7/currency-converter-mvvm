@@ -102,7 +102,6 @@ class CurrencyAdapter(private val onAmountChangedListener: BaseValueChangeListen
                 baseAmount = (view as EditText).text.toString().toFloat()
                 onAmountChangedListener.onBaseCurrencyChanged(
                     tempCur?.name.filterNullForEmpty(), baseAmount)
-
             }
         }
     }
