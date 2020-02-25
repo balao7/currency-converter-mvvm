@@ -1,4 +1,4 @@
-# rvt-currency-mvvm
+# Android currency converter
 ## Technology stack
 
  - Kotlin
